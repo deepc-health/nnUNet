@@ -110,6 +110,8 @@ ENV/
 *.png
 *.jpg
 *.jpeg
+*.IMG
 
 *.model
-
+*.nnunet*
+*.json
