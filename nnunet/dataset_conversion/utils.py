@@ -19,14 +19,14 @@ import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import *
 
 
-def get_identifiers_from_splitted_files(folder: str):
-    uniques = np.unique([i[:-12] for i in subfiles(folder, suffix='.nii.gz', join=False)])
+def get_identifiers_from_splitted_files(folder: str, suffix='.nii.gz'):
+    uniques = np.unique([i[:-12] for i in subfiles(folder, suffix=suffix, join=False)])
     return uniques
 
 
 def generate_dataset_json(output_file: str, imagesTr_dir: str, imagesTs_dir: str, modalities: Tuple,
                           labels: dict, dataset_name: str, license: str = "hands off!", dataset_description: str = "",
-                          dataset_reference="", dataset_release='0.0'):
+                          dataset_reference="", dataset_release='0.0', suffix = '.nii.gz'):
     """
     :param output_file: This needs to be the full path to the dataset.json you intend to write, so
     output_file='DATASET_PATH/dataset.json' where the folder DATASET_PATH points to is the one with the
@@ -44,10 +44,10 @@ def generate_dataset_json(output_file: str, imagesTr_dir: str, imagesTs_dir: str
     :param dataset_release:
     :return:
     """
-    train_identifiers = get_identifiers_from_splitted_files(imagesTr_dir)
+    train_identifiers = get_identifiers_from_splitted_files(imagesTr_dir, suffix)
 
     if imagesTs_dir is not None:
-        test_identifiers = get_identifiers_from_splitted_files(imagesTs_dir)
+        test_identifiers = get_identifiers_from_splitted_files(imagesTs_dir, suffix)
     else:
         test_identifiers = []
 
@@ -64,10 +64,10 @@ def generate_dataset_json(output_file: str, imagesTr_dir: str, imagesTs_dir: str
     json_dict['numTraining'] = len(train_identifiers)
     json_dict['numTest'] = len(test_identifiers)
     json_dict['training'] = [
-        {'image': "./imagesTr/%s.nii.gz" % i, "label": "./labelsTr/%s.nii.gz" % i} for i
+        {'image': f"./imagesTr/{i}{suffix}", "label": f"./labelsTr/{i}{suffix}"} for i
         in
         train_identifiers]
-    json_dict['test'] = ["./imagesTs/%s.nii.gz" % i for i in test_identifiers]
+    json_dict['test'] = [f"./imagesTs/{i}{suffix}"for i in test_identifiers]
 
     if not output_file.endswith("dataset.json"):
         print("WARNING: output file name is not dataset.json! This may be intentional or not. You decide. "
